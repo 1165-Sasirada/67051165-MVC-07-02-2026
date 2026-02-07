@@ -1,0 +1,8 @@
+id,name,income,type
+00000,Somchai,Jaidee,somchai@mail.com,12345,5000.0,LOW
+00001,Somsri,Meejai,somsri@mail.com,12345,25000.0,GENERAL
+00002,Somyot,Ruy,somyot@mail.com,12345,60000.0,HIGH
+00003,Somsak,Meesuk,somsak@mail.com,12345,5000.0,LOW
+00004,Varee,Poomjai,varee@mail.com,12345,80000.0,HIGH
+00005,Panya,Pakdee,panya@mail.com,12345,200000.0,HIGH
+00006,Somjai,Mookda,somjai@mail.com,12345,7500.0,GENERAL
