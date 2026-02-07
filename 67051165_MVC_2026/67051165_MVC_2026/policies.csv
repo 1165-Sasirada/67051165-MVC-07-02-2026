@@ -1,0 +1,4 @@
+policy_id,description,max_amount,min_income,max_income
+P01,Low Income Aid,6500,0,6499
+P02,General Aid,20000,6500,50000
+P03,High Income Aid,20000,50001,99999999
