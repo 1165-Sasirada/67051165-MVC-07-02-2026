@@ -139,28 +139,54 @@ public class GuiController {
 	}
 
 	private void handleCreateClaim() {
-		if (currentCitizen == null) {
-			 JOptionPane.showMessageDialog(frame, "Only Citizen Can Submit New Claims");
-			 return;
+		if (currentCitizen == null) return;
+
+		double income = currentCitizen.income;
+		double compensationAmount = 0;
+		String policyUsed = "";
+
+		List<String[]> policyRows = CsvDatabase.readAll(CsvDatabase.POLICIES_FILE);
+		String claimId = String.valueOf(10000000 + new Random().nextInt(90000000)); // เลข 8 หลัก
+		
+		for (String[] row : policyRows) {
+			// row: id[0], desc[1], max_amount[2], min_inc[3], max_inc[4]
+			String pId = row[0];
+			double maxAmt = Double.parseDouble(row[2]);
+			double minInc = Double.parseDouble(row[3]);
+			double maxInc = Double.parseDouble(row[4]);
+
+			if (income >= minInc && income <= maxInc) {
+				policyUsed = row[1];
+				
+				if (pId.equals("P01")) {
+					BaseClaim model = new LowIncomeClaim(claimId, currentCitizen.id, income);
+					compensationAmount = model.calculateCompensation(); 
+					
+				} else if (pId.equals("P02")) {
+					BaseClaim model = new Claim(claimId, currentCitizen.id, income);
+					compensationAmount = model.calculateCompensation();
+					
+				} else if (pId.equals("P03")) {
+					BaseClaim model = new HighIncomeClaim(claimId, currentCitizen.id, income);
+					compensationAmount = model.calculateCompensation();
+				}
+				break;
+			}
 		}
 
-		// Choose Model Logic
-		String claimId = String.valueOf(10000000 + new Random().nextInt(90000000));
-		BaseClaim model;
-		double income = currentCitizen.income;
-		
-		if (income < 6500) model = new LowIncomeClaim(claimId, currentCitizen.id, income);
-		else if (income <= 50000) model = new Claim(claimId, currentCitizen.id, income);
-		else model = new HighIncomeClaim(claimId, currentCitizen.id, income);
-
-		double amount = model.calculateCompensation();
+		// Save data
 		String date = LocalDate.now().toString();
 
-		CsvDatabase.appendRecord(CsvDatabase.CLAIMS_FILE, claimId + "," + currentCitizen.id + "," + date + ",APPROVED");
-		CsvDatabase.appendRecord(CsvDatabase.COMPENSATIONS_FILE, claimId + "," + amount + "," + date);
+		CsvDatabase.appendRecord(CsvDatabase.CLAIMS_FILE, 
+			claimId + "," + currentCitizen.id + "," + date + ",APPROVED");
+			
+		CsvDatabase.appendRecord(CsvDatabase.COMPENSATIONS_FILE, 
+			claimId + "," + compensationAmount + "," + date);
 
-		JOptionPane.showMessageDialog(frame, "Approved Claim Amount: " + amount + " Baht");
-		refreshTableData(); // Refresh Table
+		JOptionPane.showMessageDialog(frame, 
+			"Policy: " + policyUsed + "\nApproved: " + compensationAmount + " Baht");
+		
+		refreshTableData();
 	}
 
 	private void refreshTableData() {
@@ -185,7 +211,7 @@ public class GuiController {
 			String cId = claim[0]; // Claim ID
 			String uId = claim[1]; // User ID
 			String date = claim[2]; // Date
-            String status = claim[3]; // Status
+			String status = claim[3]; // Status
 			
 			// Filtering
 			if (currentCitizen != null && !uId.equals(currentCitizen.id)) {
@@ -201,18 +227,18 @@ public class GuiController {
 			}
 
 			String name = "-";
-            String surname = "-";
-            String income = "-";
+			String surname = "-";
+			String income = "-";
 
 			for (String[] u : allUsers) {
-                // CSV Claimants: id[0], name[1], surname[2], email, password, income[5], type
-                if (u[0].equals(uId)) {
-                    name = u[1];
-                    surname = u[2];
-                    income = u[5];
-                    break;
-                }
-            }
+				// CSV Claimants: id[0], name[1], surname[2], email, password, income[5], type
+				if (u[0].equals(uId)) {
+					name = u[1];
+					surname = u[2];
+					income = u[5];
+					break;
+				}
+			}
 			listPanel.tableModel.addRow(new Object[]{cId, uId, name, surname, income, date, status, amount});
 		}
 	}

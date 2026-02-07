@@ -9,6 +9,7 @@ public class CsvDatabase {
 	public static final String CLAIMANTS_FILE = "claimants.csv";
 	public static final String CLAIMS_FILE = "claims.csv";
 	public static final String COMPENSATIONS_FILE = "compensations.csv";
+	public static final String POLICIES_FILE = "policies.csv";
 
 	public static void init() {
 		createFileIfNotExists(OFFICERS_FILE, "id,name,surname,email.password\n" + 
@@ -23,6 +24,11 @@ public class CsvDatabase {
 		);
 		createFileIfNotExists(CLAIMS_FILE, "claim_id,claimant_id,date,status\n");
 		createFileIfNotExists(COMPENSATIONS_FILE, "claim_id,amount,data\n");
+		createFileIfNotExists(POLICIES_FILE, "policy_id,description,max_amount,min_income,max_income\n" +
+			"P01,Low Income Aid,6500,0,6499\n" +
+			"P02,General Aid,20000,6500,50000\n" +
+			"P03,High Income Aid,20000,50001,99999999"
+		);
 	}
 
 	public static String generateNextId(String filename) {
